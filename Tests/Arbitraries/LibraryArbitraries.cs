@@ -2,53 +2,45 @@
 using FsCheck.Fluent;
 using Library_Book_Borrowing_System.Domain;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Library_Book_Borrowing_System.Tests.Arbitraries
 {
     public class LibraryArbitraries
     {
-
+        // Генератор ISBN
         public static Arbitrary<string> Isbn()
         {
-            throw new NotImplementedException();
+            return Gen.Choose(1000, 9999)
+                      .Select(i => $"ISBN-{i}")
+                      .ToArbitrary();
         }
 
-
+        // Допоміжний генератор назв
         private static Gen<string> Title()
         {
-            throw new NotImplementedException();
-
+            return Gen.Elements("Clean Code", "Refactoring", "Design Patterns", "The Hobbit", "1984");
         }
 
-
+        // Генератор валідної книги
         public static Arbitrary<Book> Book()
         {
-            throw new NotImplementedException();
+            
+            var gen = from isbn in Isbn().Generator
+                      from title in Title()
+                      from copies in Gen.Choose(1, 50)
+                      select new Book(isbn, title, copies);
 
+            return gen.ToArbitrary();
         }
 
-
+        // Генератор користувача
         public static Arbitrary<User> User()
         {
-            throw new NotImplementedException();
+            var gen = from name in Gen.Elements("Alice", "Bob", "Charlie", "Dave")
+                      select new User(name);
 
+            return gen.ToArbitrary();
         }
-
-
-        public static Arbitrary<LibraryOperation> Operation()
-        {
-            throw new NotImplementedException();
-
-        }
-
-
-        public enum OperationType { Borrow, Return }
-
-        public record LibraryOperation(OperationType Type, string Isbn);
-
     }
 }
